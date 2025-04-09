@@ -3,7 +3,8 @@ import string
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from config import OWNER
-from helper.database import add_vip_code, use_vip_code, update_user_plan
+from helper.database import find_one, add_vip_code, use_vip_code, update_user_plan
+
 
 # تولید کد VIP یکبار مصرف توسط ادمین
 @Client.on_message(filters.private & filters.command("crate_vip"))
