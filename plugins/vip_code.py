@@ -40,8 +40,13 @@ async def redeem_vip_code(client, message: Message):
         await message.reply("ابتدا /start را ارسال کنید.")
         return
 
-    if user_data.get("usertype") != "Free":
+
+    usertype = user_data.get("usertype", "Free").lower()
+
+    if usertype != "Free":
         await message.reply("فقط کاربران با پلن رایگان می‌توانند از کد VIP استفاده کنند.")
+        print("Usertype:", user_data.get("usertype"))
+
         return
 
     if len(message.command) < 2:
