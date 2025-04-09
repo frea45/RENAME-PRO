@@ -16,6 +16,7 @@ async def create_vip_code(client: Client, message: Message):
     await message.reply(f"کد VIP با موفقیت ساخته شد:\n\n`{code}`\n\nاین کد فقط یک‌بار قابل استفاده است.")
 
 # فعالسازی پلن VIP توسط کاربر
+"""
 @Client.on_message(filters.private & filters.command("vip"))
 async def use_vip(client: Client, message: Message):
     if len(message.command) < 2:
@@ -27,4 +28,33 @@ async def use_vip(client: Client, message: Message):
         return await message.reply("کد نامعتبر یا قبلاً استفاده شده است.")
 
     update_user_plan(message.from_user.id, plan_type="VIP", days=15, daily_limit=5 * 1024**3)
-    await message.reply("پلن VIP با موفقیت فعال شد!\nمدت: 15 روز\nحجم روزانه: 5 گیگابایت\nبدون محدودیت حجم فایل.")
+    await message.reply("پلن VIP با موفقیت فعال شد!\nمدت: 15 روز\nحجم روزانه: 5 گیگابایت\nبدون محدودیت حجم فایل.") """
+
+@Client.on_message(filters.private & filters.command("vip"))
+async def redeem_vip_code(client, message: Message):
+    user_id = message.from_user.id
+    user_data = find_one(user_id)
+
+    if not user_data:
+        await message.reply("ابتدا /start را ارسال کنید.")
+        return
+
+    if user_data.get("usertype") != "Free":
+        await message.reply("فقط کاربران با پلن رایگان می‌توانند از کد VIP استفاده کنند.")
+        return
+
+    if len(message.command) < 2:
+        await message.reply("لطفاً کد VIP را به صورت زیر وارد کنید:\n`/vip CODE`")
+        return
+
+    code = message.command[1].strip()
+    result = use_vip_code(code, user_id)
+
+    if result == "used":
+        await message.reply("این کد قبلاً استفاده شده است.")
+    elif result == "not_found":
+        await message.reply("کد وارد شده نامعتبر است.")
+    elif result == "success":
+        await message.reply("پلن VIP با موفقیت برای شما فعال شد به مدت 15 روز با حجم روزانه 5 گیگ.")
+    else:
+        await message.reply("خطایی رخ داده است. لطفاً مجدداً تلاش کنید.")
