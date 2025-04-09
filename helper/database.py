@@ -122,10 +122,31 @@ def use_vip_code(user_id: int, code: str):
     update_user_plan(user_id, 5368709120, "Vip", 15)
     mark_vip_code_used(code)
     return True
-    """
+    
 def use_vip_code(code):
     vip_code = vip_codes_col.find_one({"code": code, "used": False})
     if vip_code:
         vip_codes_col.update_one({"code": code}, {"$set": {"used": True}})
         return True
     return False
+"""
+
+def use_vip_code(code, user_id):
+    code_data = vipcol.find_one({"code": code})
+    if not code_data:
+        return "not_found"
+    if code_data["used"]:
+        return "used"
+    
+    # بروزرسانی وضعیت کد
+    vipcol.update_one({"code": code}, {"$set": {"used": True, "used_by": user_id}})
+    
+    # بروزرسانی پلن کاربر
+    update_user_plan(
+        user_id,
+        usertype="VIP",
+        daily_limit=5 * 1024 * 1024 * 1024,  # 5 گیگ
+        max_upload_size=None,
+        expire_days=15
+    )
+    return "success"
