@@ -1,12 +1,12 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from datetime import datetime, timedelta
-from helper.database import find_user, is_gift_used, activate_gift_plan
+from helper.database import find_one, is_gift_used, activate_gift_plan
 
 @Client.on_message(filters.command("gift") & filters.private)
 def activate_gift_command(bot, message: Message):
     user_id = message.from_user.id
-    user_data = find_user(user_id)
+    user_data = find_one(user_id)
 
     if not user_data:
         return message.reply("برای استفاده از ربات ابتدا /start را بزنید.")
