@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from helper.database import activate_gift_plan_db, get_user_data
+from helper.database import activate_gift_plan_db, find_one
 
 @Client.on_message(filters.command("gift"))
 async def activate_gift_plan(client, message: Message):
