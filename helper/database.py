@@ -1,4 +1,3 @@
-
 import pymongo
 import os
 from helper.date import add_date
@@ -130,4 +129,3 @@ def use_vip_code(code):
         vip_codes_col.update_one({"code": code}, {"$set": {"used": True}})
         return True
     return False
-
