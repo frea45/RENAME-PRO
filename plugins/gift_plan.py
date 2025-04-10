@@ -1,7 +1,7 @@
 import time
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from helper.database import find_one, update_user_plan, has_used_gift, set_gift_used
+from helper.database import find_one, activate_gift_plan, has_used_gift, set_gift_used
 
 GIFT_UPLOAD_LIMIT = 5 * 1024 * 1024 * 1024  # 5GB
 GIFT_DURATION_DAYS = 7
