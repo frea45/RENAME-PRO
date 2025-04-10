@@ -123,15 +123,17 @@ def mark_gift_used(user_id: int):
     dbcol.update_one({"_id": user_id}, {"$set": {"gift_used": True}})
 
 def activate_gift_plan_db(user_id: int):
-    expire_date = int(time.time()) + 7 * 86400  # 7 روز بعد
-    dbcol.update_one(
+    plan_expiry = datetime.utcnow() + timedelta(days=7)
+    helperdb.users.update_one(
         {"_id": user_id},
         {"$set": {
-            "uploadlimit": 5 * 1024 * 1024 * 1024,  # 5 گیگ
-            "usertype": "Gift",
-            "prexdate": expire_date,
-            "gift_used": True
-        }}
+            "plan": "gift",
+            "daily_limit": 5 * 1024 * 1024 * 1024,  # 5 گیگ
+            "used_today": 0,
+            "last_reset": datetime.utcnow(),
+            "plan_expiry": plan_expiry
+        }},
+        upsert=True
     )
 
 
