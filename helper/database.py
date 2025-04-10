@@ -113,3 +113,27 @@ def use_vip_code(code: str, user_id: int):
         days=15
     )
     return "success"
+
+def has_used_gift(user_id: int):
+    user_data = dbcol.find_one({"_id": user_id})
+    return user_data.get("gift_used", False)
+
+def mark_gift_used(user_id: int):
+    dbcol.update_one({"_id": user_id}, {"$set": {"gift_used": True}})
+
+def activate_gift_plan_db(user_id: int):
+    expire_date = int(time.time()) + 7 * 86400  # 7 روز بعد
+    dbcol.update_one(
+        {"_id": user_id},
+        {"$set": {
+            "uploadlimit": 5 * 1024 * 1024 * 1024,  # 5 گیگ
+            "usertype": "Gift",
+            "prexdate": expire_date,
+            "gift_used": True
+        }}
+    )
+
+
+
+
+                          
