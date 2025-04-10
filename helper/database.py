@@ -116,28 +116,13 @@ def use_vip_code(code: str, user_id: int):
     )
     return "success"
 
-def has_used_gift(user_id: int):
-    user_data = dbcol.find_one({"_id": user_id})
-    return user_data.get("gift_used", False)
-
-def mark_gift_used(user_id: int):
-    dbcol.update_one({"_id": user_id}, {"$set": {"gift_used": True}})
-
-def activate_gift_plan_db(user_id: int):
-    plan_expiry = datetime.utcnow() + timedelta(days=7)
-    helperdb.users.update_one(
-        {"_id": user_id},
-        {"$set": {
-            "plan": "gift",
-            "daily_limit": 5 * 1024 * 1024 * 1024,  # 5 گیگ
-            "used_today": 0,
-            "last_reset": datetime.utcnow(),
-            "plan_expiry": plan_expiry
-        }},
-        upsert=True
+    update_user_plan2(
+        user_id=user_id,
+        usertype="7days",
+        daily_limit=5 * 1024 * 1024 * 1024,  # 5 گیگ
+        days=7
     )
-
-
+    return "success"
 
 
                           
