@@ -29,9 +29,11 @@ async def show_plan(client, message):
     remain = int(limit) - int(used)
     user = _newus["usertype"]
     ends = _newus["prexdate"]
+    gift_used = _newus.get("gift_used", False)
 
     bar = progress_bar(used, limit)
 
+    # چک تاریخ انقضا
     if ends and user != "Free":
         pre_check = check_expi(ends)
         if pre_check == False:
@@ -40,12 +42,18 @@ async def show_plan(client, message):
             ends = None
             user = "Free"
 
+    # تعیین نام پلن برای نمایش
+    if user == "Vip" and gift_used:
+        user_display = "هدیه (۷ روزه)"
+    else:
+        user_display = user
+
     if ends:
         normal_date = datetime.fromtimestamp(ends).strftime('%Y-%m-%d')
         remaining_days = (datetime.fromtimestamp(ends) - datetime.now()).days
         text = f"""**🔺 نام کاربر :** {message.from_user.mention}
 **🔺 آیدی عددی شما :** `{message.from_user.id}`
-🔮 **پلن فعلی شما :** {user} 
+🔮 **پلن فعلی شما :** {user_display} 
 💽 **حجم محدودیت روزانه :** {humanbytes(limit)} 
 ✅ **حجم استفاده شده :** {humanbytes(used)} 
 ☑️ **حجم باقی مانده :** {humanbytes(remain)} 
@@ -56,7 +64,7 @@ async def show_plan(client, message):
     else:
         text = f"""**🔺 نام کاربر :** {message.from_user.mention}
 **🔺 آیدی عددی شما :** `{message.from_user.id}`
-🔮 **پلن فعلی شما :** {user} 
+🔮 **پلن فعلی شما :** {user_display} 
 💽 **حجم محدودیت روزانه :** {humanbytes(limit)} 
 ✅ **حجم استفاده شده :** {humanbytes(used)} 
 ☑️ **حجم باقی مانده :** {humanbytes(remain)} 
