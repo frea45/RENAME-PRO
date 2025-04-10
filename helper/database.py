@@ -130,3 +130,18 @@ def use_vip_code(code):
         vip_codes_col.update_one({"code": code}, {"$set": {"used": True}})
         return True
     return False
+
+def activate_gift_plan(user_id: int):
+    from datetime import datetime, timedelta
+    dbcol.update_one(
+        {"_id": user_id},
+        {"$set": {
+            "uploadlimit": 0,
+            "usertype": "Vip",  # به عنوان Vip تنظیم می‌کنیم تا با بقیه سازگار باشه
+            "daily": 5 * 1024 * 1024 * 1024,  # 5 گیگ
+            "used_limit": 0,
+            "date": int(time.time()),
+            "prexdate": int((datetime.now() + timedelta(days=7)).timestamp()),
+            "gift_used": True
+        }}
+    )
