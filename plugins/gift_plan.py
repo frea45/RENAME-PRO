@@ -1,35 +1,41 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from helper.database import activate_gift_plan_db, find_one
+from datetime import datetime, timedelta
+from helper.database import (
+    activate_gift_plan_db,
+    get_user_data,
+    mark_gift_used,
+    has_used_gift
+)
+from config import LOG_CHANNEL
 
 @Client.on_message(filters.command("gift"))
-async def activate_gift_plan(client, message: Message):
+async def activate_gift_plan(client: Client, message: Message):
     user_id = message.from_user.id
     user_data = get_user_data(user_id)
 
-    if user_data.get("plan") in ["silver", "gold", "diamond"]:
-        return await message.reply("شما قبلاً یک پلن فعال دارید و نمی‌توانید از پلن هدیه استفاده کنید.")
+    if has_used_gift(user_id):
+        await message.reply_text("شما قبلاً از پلن هدیه یک‌هفته‌ای استفاده کرده‌اید.")
+        return
 
-    if user_data.get("gift_used"):
-        return await message.reply("شما قبلاً از پلن هدیه استفاده کرده‌اید.")
-
-    # فعال‌سازی پلن هدیه
+    # فعالسازی پلن هدیه در دیتابیس
     activate_gift_plan_db(user_id)
+    mark_gift_used(user_id)
 
-    # ثبت استفاده از هدیه
-    from helper.database import set_gift_used
-    set_gift_used(user_id)
+    await message.reply_text(
+        "پلن هدیه با موفقیت برای شما فعال شد!\n"
+        "مدت زمان: 7 روز\n"
+        "حجم روزانه: 5 گیگابایت\n"
+        "لذت ببرید!"
+    )
 
-    await message.reply("پلن هدیه 7 روزه با موفقیت فعال شد!\nحجم روزانه: 5 گیگ")
-
-    # ارسال گزارش به کانال لاگ
-    log_channel = -100123456789  # شناسه کانال لاگ واقعی رو بذار
-    user = message.from_user
-    text = f"""پلن هدیه فعال شد.
-نام کاربر: {user.first_name}
-آیدی عددی: {user.id}
-نام پلن: gift"""
-    try:
-        await client.send_message(log_channel, text)
-    except:
-        pass
+    # ارسال پیام به کانال لاگ
+    await client.send_message(
+        LOG_CHANNEL,
+        f"🎁 پلن هدیه فعال شد!\n\n"
+        f"👤 کاربر: {message.from_user.mention}\n"
+        f"🆔 آیدی: `{user_id}`\n"
+        f"⏳ مدت: 7 روز\n"
+        f"📦 حجم روزانه: 5 گیگابایت\n"
+        f"📅 تاریخ: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    )
