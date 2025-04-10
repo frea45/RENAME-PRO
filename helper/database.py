@@ -91,6 +91,8 @@ def use_vip_code(code: str, user_id: int):
         days=15
     )
     return "success"
+def find_user(user_id):
+    return dbcol.find_one({"_id": user_id})
 
 def has_used_gift(user_id: int):
     user_data = dbcol.find_one({"_id": user_id})
