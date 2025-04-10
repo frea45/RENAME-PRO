@@ -145,3 +145,9 @@ def activate_gift_plan(user_id: int):
             "gift_used": True
         }}
     )
+def has_used_gift(user_id):
+    user = dbcol.find_one({"_id": user_id})
+    return user.get("gift_used", False)
+
+def set_gift_used(user_id):
+    dbcol.update_one({"_id": user_id}, {"$set": {"gift_used": True}})
