@@ -75,8 +75,6 @@ def delete(id):
 def find_one(id):
     return dbcol.find_one({"_id": id})
     #--
-def get_user_data(user_id: int):
-    return dbcol.find_one({"_id": user_id}) or {}
 
 # VIP code management
 def add_vip_code(code: str):
