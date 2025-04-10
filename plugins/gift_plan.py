@@ -1,47 +1,39 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from helper.database import find_one, activate_gift_plan_db, has_used_gift
-import time
-from config import LOG_CHANNEL, OWNER 
+from helper.database import activate_gift_plan_db, get_user_plan
+from config import OWNER, LOG_CHANNEL
 
-@Client.on_message(filters.private & filters.command("gift"))
-async def activate_gift_plan(client, message: Message):
+@Client.on_message(filters.command("gift") & filters.private)
+async def activate_gift_plan(client: Client, message: Message):
     user_id = message.from_user.id
-    user_data = find_one(user_id)
 
-    if not user_data:
-        await message.reply("ابتدا /start را ارسال کنید.")
-        return
+    # بررسی اینکه کاربر جزو پلن‌های نقره‌ای، طلایی یا الماسی نباشد
+    user_plan = get_user_plan(user_id)
+    if user_plan in ["silver", "gold", "diamond"]:
+        return await message.reply("شما در حال حاضر دارای پلن فعال هستید و نمی‌توانید از پلن هدیه استفاده کنید.")
 
-    current_plan = user_data.get("usertype", "Free")
-    if current_plan in ["Silver", "Gold", "Diamond"]:
-        await message.reply("شما پلن فعال دارید و نمی‌توانید از پلن هدیه استفاده کنید.")
-        return
+    # بررسی اینکه کاربر قبلاً از پلن هدیه استفاده کرده یا نه
+    user_data = client.db.users.find_one({"_id": user_id})
+    if user_data and user_data.get("gift_used", False):
+        return await message.reply("شما قبلاً از پلن هدیه استفاده کرده‌اید.")
 
-    if has_used_gift(user_id):
-        await message.reply("شما قبلاً از پلن هدیه استفاده کرده‌اید.")
-        return
+    # فعال‌سازی پلن هدیه برای 7 روز
+    activate_gift_plan_db(user_id)
 
-    # فعال‌سازی پلن هدیه
-    update_user_plan(
-        user_id=user_id,
-        upload_limit=5 * 1024 * 1024 * 1024,  # 5 گیگ
-        user_type="Gift",
-        days=7
+    # بروزرسانی وضعیت gift_used برای جلوگیری از استفاده مجدد
+    client.db.users.update_one({"_id": user_id}, {"$set": {"gift_used": True}}, upsert=True)
+
+    await message.reply("پلن هدیه 7 روزه با موفقیت برای شما فعال شد!")
+
+    # اطلاع‌رسانی در لاگ
+    text = (
+        f"پلن GIFT 7 روزه فعال شد.\n"
+        f"نام کاربر: {message.from_user.first_name}\n"
+        f"آیدی عددی: {user_id}\n"
+        f"نام پلن: gift"
     )
-
-    await message.reply("پلن هدیه ۷ روزه با موفقیت برای شما فعال شد. حجم روزانه: ۵ گیگ")
-
-    # اطلاع‌رسانی در کانال لاگ و (ارسال به ادمین کامنت شده)
     try:
-        user_mention = f"{message.from_user.mention}"
-        log_text = (
-            f"پلن هدیه فعال شد.\n"
-            f"نام کاربر: {user_mention}\n"
-            f"آیدی عددی: `{user_id}`\n"
-            f"نام پلن: Gift"
-        )
-        await client.send_message(LOG_CHANNEL, log_text)
-        # await client.send_message(int(OWNER), log_text)  # ارسال به ادمین (کامنت شده)
-    except Exception as e:
-        print(f"خطا در ارسال به لاگ یا ادمین: {e}")
+        await client.send_message(LOG_CHANNEL, text)
+        # await client.send_message(OWNER, text)  # اگر خواستی به OWNER هم ارسال بشه، این رو از حالت کامنت خارج کن
+    except:
+        pass
