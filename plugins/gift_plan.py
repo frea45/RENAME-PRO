@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from helper.database import find_one, activate_gift_plan_db, has_used_gift
 import time
-from config import LOG_CHANNEL, ADMIN
+from config import LOG_CHANNEL, OWNER 
 
 @Client.on_message(filters.private & filters.command("gift"))
 async def activate_gift_plan(client, message: Message):
@@ -42,6 +42,6 @@ async def activate_gift_plan(client, message: Message):
             f"نام پلن: Gift"
         )
         await client.send_message(LOG_CHANNEL, log_text)
-        # await client.send_message(int(ADMIN), log_text)  # ارسال به ادمین (کامنت شده)
+        # await client.send_message(int(OWNER), log_text)  # ارسال به ادمین (کامنت شده)
     except Exception as e:
         print(f"خطا در ارسال به لاگ یا ادمین: {e}")
