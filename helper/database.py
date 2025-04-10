@@ -4,6 +4,7 @@ import time
 from helper.date import add_date
 from config import *
 from datetime import datetime, timedelta
+#from config import DB_URL, DB_NAME
 
 mongo = pymongo.MongoClient(DB_URL)
 db = mongo[DB_NAME]
@@ -138,6 +139,26 @@ def activate_gift_plan_db(user_id: int):
     )
 
 
+async def find_user(user_id: int):
+    return await dbcol.find_one({"_id": user_id})
+
+async def is_gift_used(user_id: int) -> bool:
+    user = await dbcol.find_one({"_id": user_id})
+    gift_plan = user.get("gift_plan", {})
+    return gift_plan.get("used", False)
+
+async def activate_gift_plan(user_id: int):
+    end_date = datetime.now() + timedelta(days=7)
+    gift_data = {
+        "used": True,
+        "daily_limit": 5 * 1024**3,  # 5 گیگ
+        "end_date": end_date.timestamp()
+    }
+    await dbcol.update_one(
+        {"_id": user_id},
+        {"$set": {"gift_plan": gift_data}},
+        upsert=True
+    )
 
 
                           
