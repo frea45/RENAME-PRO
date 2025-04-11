@@ -1,11 +1,11 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from helper.database import find_one, update_user_plan2
+from helper.database import find_one, update_user_plan2, update_one
 
 @Client.on_message(filters.command("gift") & filters.private)
 async def gift_plan_handler(client: Client, message: Message):
     user_id = message.from_user.id
-    user_data = await find_one(user_id)
+    user_data = find_one(user_id)  # بدون await
 
     if not user_data:
         return await message.reply("لطفاً ابتدا با استفاده از /start ثبت‌نام کنید.")
@@ -17,7 +17,7 @@ async def gift_plan_handler(client: Client, message: Message):
     if user_data.get("gift_used"):
         return await message.reply("شما قبلاً از پلن هدیه استفاده کرده‌اید.")
 
-    result = await update_user_plan2(
+    result = update_user_plan2(
         user_id=user_id,
         usertype="7days",
         daily_limit=5 * 1024 * 1024 * 1024,  # 5 گیگ
@@ -25,8 +25,7 @@ async def gift_plan_handler(client: Client, message: Message):
     )
 
     if result == "success":
-        from helper.database import update_one
-        await update_one(user_id, {"gift_used": True})
+        update_one(user_id, {"gift_used": True})  # بدون await
         await message.reply("پلن هدیه ۷ روزه با موفقیت برای شما فعال شد.\nروزانه 5 گیگ محدودیت دارید.")
     else:
         await message.reply("خطا در فعال‌سازی پلن هدیه. لطفاً دوباره تلاش کنید.")
