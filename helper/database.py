@@ -124,7 +124,7 @@ def use_vip_code(code: str, user_id: int):
     )
     return "success"
 
-
+"""
 fsub_channels = []
 
 def add_fsub_channel(username: str):
@@ -137,4 +137,17 @@ def remove_fsub_channel(username: str):
 
 def get_fsub_channels():
     return fsub_channels
+    """
+def update_user_plan2(user_id: int, usertype: str = "Free", daily_limit: int = 1074490188, days: int = 0):
+    expire_date = int(time.time()) + days * 86400 if days > 0 else None
+    update_fields = {
+        "usertype": usertype,
+        "uploadlimit": daily_limit
+    }
+    if expire_date:
+        update_fields["prexdate"] = expire_date
+
+    result = dbcol.update_one({"_id": user_id}, {"$set": update_fields})
+    return "success" if result.modified_count else "failed"
+
                           
