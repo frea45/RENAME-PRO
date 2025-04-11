@@ -63,7 +63,7 @@ async def show_plan(client, message):
 📊 **درصد استفاده شده :** {bar}
 ⌚ **فاصله زمانی بین فایل ها :** 60 ثانیه"""
 
-    if user in ["Free", "ban1", "ban", "dft"]:
+    if ends and user not in ["Free", "cp1", "cp2", "dft"]:
         await message.reply(text, quote=True, reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("🔖 ارتقا پلن", callback_data="upgrade"),
              InlineKeyboardButton("✖️ بستن", callback_data="cancel")]
