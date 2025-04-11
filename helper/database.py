@@ -150,4 +150,8 @@ def update_user_plan2(user_id: int, usertype: str = "Free", daily_limit: int = 1
     result = dbcol.update_one({"_id": user_id}, {"$set": update_fields})
     return "success" if result.modified_count else "failed"
 
+def update_one(user_id: int, update_dict: dict):
+    dbcol.update_one({"_id": user_id}, {"$set": update_dict})
+
+
                           
