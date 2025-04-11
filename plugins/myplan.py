@@ -32,13 +32,13 @@ async def show_plan(client, message):
 
     bar = progress_bar(used, limit)
 
-    if ends and user != "Free":
+    if ends and user != "Free", "cp1", "cp2", "dft":
         pre_check = check_expi(ends)
         if pre_check == False:
             uploadlimit(message.from_user.id, 1288490188)
             usertype(message.from_user.id, "Free")
             ends = None
-            user = "Free"
+            user = "Free","cp1", "cp2", "dft"
 
     if ends:
         normal_date = datetime.fromtimestamp(ends).strftime('%Y-%m-%d')
