@@ -74,8 +74,11 @@ def delete(id):
 
 def find_one(id):
     return dbcol.find_one({"_id": id})
-    #--
+    
 
+#------------------------------------------------------------#
+#------------👇---کد های مربوط به پلن  15 روزه ----👇----------#
+#------------------------------------------------------------#
 # VIP code management
 def add_vip_code(code: str):
     vipcol.insert_one({"code": code, "used": False})
@@ -138,6 +141,9 @@ def remove_fsub_channel(username: str):
 def get_fsub_channels():
     return fsub_channels
     """
+#------------------------------------------------------------#
+#------------👇---کد های مربوط به پلن یک هفته رایگان----👇-----------#
+#------------------------------------------------------------#
 def update_user_plan2(user_id: int, usertype: str = "Free", daily_limit: int = 1074490188, days: int = 0):
     expire_date = int(time.time()) + days * 86400 if days > 0 else None
     update_fields = {
