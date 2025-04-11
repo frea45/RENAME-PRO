@@ -88,7 +88,7 @@ async def cp1(bot,update):
 	user_id = id[1].replace(" ", "")
 	inlimit  = 2147483652
 	uploadlimit(int(user_id), 2147483652)
-	usertype(int(user_id),"⚠️ Account Downgraded")
+	usertype(int(user_id),"ban1")
 	addpre(int(user_id))
 	await update.message.edit("Added Successfully To Upload Limit 2GB")
 	await bot.send_message(user_id,"Hey You Are Downgraded To Cease Limit 2GB. Check Your Plan Here /myplan \n\n**Contact Admin :** @calladminrobot")
@@ -100,7 +100,7 @@ async def cp2(bot,update):
 	user_id = id[1].replace(" ", "")
 	inlimit  = 0
 	uploadlimit(int(user_id), 0)
-	usertype(int(user_id),"⚠️ Account Downgraded")
+	usertype(int(user_id),"ban")
 	addpre(int(user_id))
 	await update.message.edit("Added Successfully To Upload Limit 0GB")
 	await bot.send_message(user_id,"Hey You Are Downgraded To Cease Limit 0GB. Check Your Plan Here /myplan \n\n**Contact Admin :** @Kirodewal")
