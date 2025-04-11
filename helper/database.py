@@ -125,4 +125,16 @@ def use_vip_code(code: str, user_id: int):
     return "success"
 
 
+fsub_channels = []
+
+def add_fsub_channel(username: str):
+    if username not in fsub_channels:
+        fsub_channels.append(username)
+
+def remove_fsub_channel(username: str):
+    if username in fsub_channels:
+        fsub_channels.remove(username)
+
+def get_fsub_channels():
+    return fsub_channels
                           
