@@ -72,3 +72,4 @@ async def show_plan(client, message):
         await message.reply(text, quote=True, reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("✖️ بستن ✖️", callback_data="cancel")]
         ]))
+        
