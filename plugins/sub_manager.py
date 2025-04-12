@@ -5,7 +5,7 @@ from helper.channel_helper import save_channels, load_channels
 
 channel_data = {}
 
-@Client.on_message(filters.command("manger_sub") & filters.user(ADMINS))
+@Client.on_message(filters.command("manger_sub") & filters.user(OWNER))
 async def manage_sub_handler(client, message: Message):
     user_id = message.from_user.id
     channels = load_channels()
@@ -33,7 +33,7 @@ async def ask_username(client, callback_query: CallbackQuery):
     await callback_query.answer()
 
 
-@Client.on_message(filters.text & filters.user(ADMINS))
+@Client.on_message(filters.text & filters.user(OWNER))
 async def handle_channel_username(client, message: Message):
     user_id = message.from_user.id
     if user_id not in channel_data:
