@@ -176,5 +176,25 @@ async def send_doc(client, message):
                 [[InlineKeyboardButton("📝 Rᴇɴᴀᴍᴇ", callback_data="rename"),
                   InlineKeyboardButton("✖️ Cᴀɴᴄᴇʟ", callback_data="cancel")]]))
               
+
+
+@Client.on_callback_query(filters.regex("check_subs"))
+async def check_subscription(client, callback_query):
+    user_id = callback_query.from_user.id
+    channels = load_channels()
+
+    for ch in channels:
+        try:
+            member = await client.get_chat_member(ch, user_id)
+            if member.status not in ("member", "administrator", "creator"):
+                raise UserNotParticipant
+        except UserNotParticipant:
+            await callback_query.answer("شما عضو کانال خواسته نیستید!", show_alert=False)
+            return
+        except Exception:
+            await callback_query.answer("خطا در بررسی عضویت. بعداً تلاش کنید.", show_alert=True)
+            return
+
+    await callback_query.answer("با موفقیت انجام شد", show_alert=False)
               
               
