@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from config import ADMINS, FORCE_SUBS
+from config import OWNER, FORCE_SUBS
 from helper.channel_helper import save_channels, load_channels
 
 channel_data = {}
