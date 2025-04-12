@@ -16,6 +16,7 @@ from pyrogram.file_id import FileId
 from helper.database import daily as daily_
 from helper.date import check_expi
 from config import *
+from helper.channel_helper import load_channels
 
 bot_username = BOT_USERNAME
 log_channel = LOG_CHANNEL
@@ -47,23 +48,54 @@ async def start(client, message):
                                         ]))
     return
 
+
 @Client.on_message((filters.private & (filters.document | filters.audio | filters.video)) | filters.channel & (filters.document | filters.audio | filters.video))
 async def send_doc(client, message):
-    update_channel = FORCE_SUBS
     user_id = message.from_user.id
-    if update_channel:
-        try:
-            await client.get_chat_member(update_channel, user_id)
-        except UserNotParticipant:
-            _newus = find_one(message.from_user.id)
+    channels = load_channels()
+
+    # بررسی عضویت کاربر در همه کانال‌ها
+    if channels:
+        not_joined = []
+        for ch in channels:
+            try:
+                member = await client.get_chat_member(ch, user_id)
+                if member.status not in ("member", "administrator", "creator"):
+                    not_joined.append(ch)
+            except:
+                not_joined.append(ch)
+
+        if not_joined:
+            # اگر در یک یا چند کانال عضو نیست
+            buttons = [
+                [InlineKeyboardButton(text=ch, url=f"https://t.me/{ch.lstrip('@')}")] for ch in channels
+            ]
+            buttons.append([InlineKeyboardButton("✅ بررسی عضویت", callback_data="check_subs")])
+
+            _newus = find_one(user_id)
             user = _newus["usertype"]
-            await message.reply_text("<b>Hello Dear \n\nYou Need To Join In My Channel To Use Me\n\nKindly Please Join Channel</b>",
-                                     reply_to_message_id=message.id,
-                                     reply_markup=InlineKeyboardMarkup(
-                                         [[InlineKeyboardButton("🔺 Update Channel 🔺", url=f"https://t.me/{update_channel}")]]))
-            await client.send_message(log_channel,f"<b><u>New User Started The Bot</u></b> \n\n<b>User ID</b> : `{user_id}` \n<b>First Name</b> : {message.from_user.first_name} \n<b>Last Name</b> : {message.from_user.last_name} \n<b>User Name</b> : @{message.from_user.username} \n<b>User Mention</b> : {message.from_user.mention} \n<b>User Link</b> : <a href='tg://openmessage?user_id={user_id}'>Click Here</a> \n<b>User Plan</b> : {user}",
-                                                                                                       reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔺  Rᴇsᴛʀɪᴄᴛ Usᴇʀ ( **PM** )  🔺", callback_data="ceasepower")]]))
+            await message.reply_text("<b>برای استفاده از ربات لطفاً در کانال‌های زیر عضو شوید:</b>", reply_to_message_id=message.id,
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            await client.send_message(
+                LOG_CHANNEL,
+                f"<b><u>New User Started The Bot</u></b>\n\n"
+                f"<b>User ID</b> : `{user_id}`\n"
+                f"<b>First Name</b> : {message.from_user.first_name}\n"
+                f"<b>Last Name</b> : {message.from_user.last_name}\n"
+                f"<b>User Name</b> : @{message.from_user.username}\n"
+                f"<b>User Mention</b> : {message.from_user.mention}\n"
+                f"<b>User Link</b> : <a href='tg://openmessage?user_id={user_id}'>Click Here</a>\n"
+                f"<b>User Plan</b> : {user}",
+                reply_markup=InlineKeyboardMarkup(
+                    [[InlineKeyboardButton("🔺 Rᴇsᴛʀɪᴄᴛ Usᴇʀ ( **PM** ) 🔺", callback_data="ceasepower")]]
+                )
+            )
             return
+
+    # ادامه پردازش فایل پس از تأیید عضویت
+    # ...
+
 		
     botdata(int(botid))
     bot_data = find_one(int(botid))
