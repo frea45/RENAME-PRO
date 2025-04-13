@@ -6,18 +6,24 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 
 async def fix_thumb(thumb):
-    if thumb is not None:
-        metadata = extractMetadata(createParser(thumb))
-        if metadata is not None and metadata.has("width") and metadata.has("height"):
-            width = metadata.get("width")
-            height = metadata.get("height")
-        else:
-            width, height = 1280, 720
-        Image.open(thumb).convert("RGB").save(thumb)
-        img = Image.open(thumb)
-        img.save(thumb, "JPEG")
-        return width, height, thumb
-    return 1280, 720, None
+    width = 0
+    height = 0
+    try:
+        if thumb != None:
+            metadata = extractMetadata(createParser(thumb))
+            if metadata.has("width"):
+                width = metadata.get("width")
+            if metadata.has("height"):
+                height = metadata.get("height")
+                Image.open(thumb).convert("RGB").save(thumb)
+                img = Image.open(thumb)
+                img.resize((320, height))
+                img.save(thumb, "JPEG")
+    except Exception as e:
+        print(e)
+        thumb = None 
+       
+    return width, height, thumb
     
 async def take_screen_shot(video_file, output_directory, ttl):
     out_put_file_name = f"{output_directory}/{time.time()}.jpg"
@@ -42,3 +48,17 @@ async def take_screen_shot(video_file, output_directory, ttl):
     if os.path.lexists(out_put_file_name):
         return out_put_file_name
     return None
+
+#import asyncio
+
+async def cut_video_ffmpeg(input_path, output_path, start, end):
+    cmd = [
+        "ffmpeg",
+        "-i", input_path,
+        "-ss", start,
+        "-to", end,
+        "-c", "copy",
+        output_path
+    ]
+    process = await asyncio.create_subprocess_exec(*cmd)
+    await process.communicate()
