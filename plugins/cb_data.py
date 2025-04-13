@@ -189,7 +189,7 @@ async def vid(bot, update):
     else:
         try:
             ph_path_ = await take_screen_shot(file_path, os.path.dirname(os.path.abspath(file_path)), random.randint(0, duration - 1))
-            width, height, ph_path = await width, height, thumb = await fix_thumb(ph_path_)
+            width, height, thumb = await fix_thumb(ph_path_)
         except Exception as e:
             ph_path = None
             print(e)
