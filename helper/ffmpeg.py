@@ -50,7 +50,7 @@ async def take_screen_shot(video_file, output_directory, ttl):
     return None
 
 #import asyncio
-
+"""
 async def cut_video_ffmpeg(input_path, output_path, start, end):
     cmd = [
         "ffmpeg",
@@ -62,3 +62,4 @@ async def cut_video_ffmpeg(input_path, output_path, start, end):
     ]
     process = await asyncio.create_subprocess_exec(*cmd)
     await process.communicate()
+"""
